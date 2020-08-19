@@ -42,7 +42,7 @@ class DesignResource extends JsonResource
             'comments_count' => $this->comments()->count(),
             'comments' => CommentResource::collection(
                             $this->whenLoaded('comments')),
-            'user' => new UserResource($this->whenLoaded('user'))
+            'user' => new UserResource($this->whenLoaded('user')) // we can use resources in resources in laravel
             
         ];
     }

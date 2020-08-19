@@ -22,6 +22,7 @@ class DesignController extends Controller
     
     public function __construct(IDesign $designs)
     {
+        // we are injecting the Design/contract class in our controller 
         $this->designs = $designs;
     }
 
@@ -42,12 +43,14 @@ class DesignController extends Controller
         return new DesignResource($design);
     }
 
+    // pick the request that the user is sending through
     public function update(Request $request, $id)
     {
-
         $design = $this->designs->find($id);
 
+        // apply the DesignPolic, here we authorize the update method and check for the $design resource
         $this->authorize('update', $design);
+        // $id because we want to be able to exclude the current design from the validation process
         $this->validate($request, [
             'title' => ['required', 'unique:designs,title,'. $id],
             'description' => ['required', 'string', 'min:20', 'max:140'],
@@ -64,7 +67,7 @@ class DesignController extends Controller
             'is_live' => ! $design->upload_successful ? false : $request->is_live
         ]);
 
-        // apply the tags
+        // apply the tags, see eloquent-taggable for more infos
         $this->designs->applyTags($id, $request->tags);
         
         return new DesignResource($design);
@@ -74,9 +77,10 @@ class DesignController extends Controller
     {
         $design = $this->designs->find($id);
         $this->authorize('delete', $design);
-        // delete the files associated to the record
+        // delete the files associated with the record (3 files)
         foreach(['thumbnail', 'large', 'original'] as $size){
-            // check if the file exists in the database
+            // check if the file exists in the database; call the exists() method which needs the filepath where we want to check if the file exits
+            // if that file exits in that storage, go ahead and delete it
             if(Storage::disk($design->disk)->exists("uploads/designs/{$size}/".$design->image)){
                 Storage::disk($design->disk)->delete("uploads/designs/{$size}/".$design->image);
             }

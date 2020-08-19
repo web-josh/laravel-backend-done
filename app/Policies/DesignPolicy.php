@@ -51,8 +51,11 @@ class DesignPolicy
      * @param  \App\Models\Design  $design
      * @return mixed
      */
+    // returns a boolean true or false, true means that the person is authorized
+    // with return false; nobody would be able do update a design
     public function update(User $user, Design $design)
     {
+        // User is automatically injected by laravel which picks up the currently authenticated user
         return $design->user_id === $user->id;
     }
 

@@ -8,6 +8,8 @@ use App\Exceptions\ModelNotDefined;
 use App\Repositories\Contracts\IBase;
 use App\Repositories\Criteria\ICriteria;
 
+// this abstract class contains all of common methods that we use use across models
+// abstract classes can not be instantiated on their own, they need to be extended by other repositories
 abstract class BaseRepository implements IBase, ICriteria
 {
 
@@ -85,6 +87,9 @@ abstract class BaseRepository implements IBase, ICriteria
             throw new ModelNotDefined();
         }
 
+        // if the model exists in this subclass we want to return the namespace of the model
+        // so its going to set the $model property to what is resolved by the getModelClass() fcuntion
+        // this means we can use $this->model->all() instead of User::all()
         return app()->make($this->model());
 
     }

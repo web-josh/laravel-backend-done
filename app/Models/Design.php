@@ -47,8 +47,13 @@ class Design extends Model
                 ->orderBy('created_at', 'asc');
     }
 
+    
     public function getImagesAttribute()
     {
+        // in the frontend we just want to display the link that we get from the api
+        // we define a Accessor (Getter) method here on this model where "Images" in getImagesAttribute is the name of the column we want to access
+        // The accessor will automatically be called by Eloquent when attempting to retrieve the value of the Images attribute
+        // this will enable us to call $this->images; returns an array
         
         return [
             'thumbnail' => $this->getImagePath('thumbnail'),
@@ -59,6 +64,7 @@ class Design extends Model
 
     protected function getImagePath($size)
     {
+        // we can call the $this->disk property because we call this in a model instance so we have access to $this
         return Storage::disk($this->disk)
                         ->url("uploads/designs/{$size}/".$this->image);
     }
