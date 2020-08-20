@@ -33,7 +33,9 @@ class DesignRepository extends BaseRepository implements IDesign
 
     public function like($id)
     {
+        // get the design that we want to like by id
         $design = $this->model->findOrFail($id);
+        // if we do have a model returned we go ahead and like or unlike; isLikedByUser() is defined in the Likeable trait thats why we have access to it here
         if($design->isLikedByUser(auth()->id())){
             $design->unlike();
         } else {

@@ -16,6 +16,7 @@ class CommentController extends Controller
 
     public function __construct(IComment $comments, IDesign $designs)
     {
+        // inject the repository
         $this->comments = $comments;
         $this->designs = $designs;
     }
@@ -26,6 +27,7 @@ class CommentController extends Controller
             'body' => ['required']
         ]);
         
+        // call the addComment() method in the DesignRepository
         $comment = $this->designs->addComment($designId, [
             'body' => $request->body,
             'user_id' => auth()->id()
@@ -36,12 +38,16 @@ class CommentController extends Controller
 
     public function update(Request $request, $id)
     {
+        // search comment by id
         $comment = $this->comments->find($id);
+        // check for authorization on the comment
         $this->authorize('update', $comment);
 
+        // validate the request that is coming through, all we need from the ui is the body of the comment
         $this->validate($request, [
             'body' => ['required']
         ]);
+        // then simply update the comment (using the repository comments)
         $comment = $this->comments->update($id, [
             'body' => $request->body
         ]);

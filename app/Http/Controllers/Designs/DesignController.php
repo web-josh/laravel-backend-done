@@ -101,6 +101,7 @@ class DesignController extends Controller
 
     public function checkIfUserHasLiked($designId)
     {
+        // check if that user has already liked that design, if they have not, we can show the like button
         $isLiked = $this->designs->isLikedByUser($designId);
         return response()->json(['liked' => $isLiked], 200);
     }

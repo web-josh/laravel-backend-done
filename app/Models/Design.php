@@ -43,6 +43,8 @@ class Design extends Model
     
     public function comments()
     {
+        // the relationship is commentable
+        // provide a default sort order->order bei created_at, descending
         return $this->morphMany(Comment::class, 'commentable')
                 ->orderBy('created_at', 'asc');
     }
