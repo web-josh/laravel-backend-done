@@ -38,7 +38,7 @@ class ChatController extends Controller
         // between the auth user and the recipient
         $chat = $user->getChatWithUser($recipient);
 
-        if(! $chat){
+        if (! $chat) {
             $chat = $this->chats->create([]);
             $this->chats->createParticipants($chat->id, [$user->id, $recipient]);
         }

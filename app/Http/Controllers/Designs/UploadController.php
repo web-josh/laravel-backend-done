@@ -21,7 +21,7 @@ class UploadController extends Controller
         // validate the request
         $this->validate($request, [
             'image' => ['required', 'mimes:jpeg,gif,bmp,png', 'max:2048']
-        ]); 
+        ]);
 
         // get the image from the request
         $image = $request->file('image');
@@ -32,8 +32,8 @@ class UploadController extends Controller
         // also get a timestamp in case files with equal filename gets uploaded: timestamp()_lower_case.png
         // time() gives the current timestamp, then append to an underscore, then use php preg_replace function which takes a regular expression
         // and replaces it with an underscore
-        $filename = time()."_". preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
-        
+        $filename = time() . "_" . preg_replace('/\s+/', '_', strtolower($image->getClientOriginalName()));
+
         // move the image to the temporary location (here tmp)
         // storeAs() comes with laravel's storage facade, it takes the sub folder that we want to save in, second arguement is the name of the file, here we just
         // pass the filename what we generated above
@@ -49,8 +49,7 @@ class UploadController extends Controller
 
         // dispatch a job to handle the image manipulation
         $this->dispatch(new UploadImage($design));
-        
-        return response()->json($design, 200);
 
+        return response()->json($design, 200);
     }
 }

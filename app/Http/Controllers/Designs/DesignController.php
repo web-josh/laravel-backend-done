@@ -19,10 +19,10 @@ use App\Repositories\Eloquent\Criteria\{
 class DesignController extends Controller
 {
     protected $designs;
-    
+
     public function __construct(IDesign $designs)
     {
-        // we are injecting the Design/contract class in our controller 
+        // we are injecting the Design/contract class in our controller
         $this->designs = $designs;
     }
 
@@ -52,24 +52,24 @@ class DesignController extends Controller
         $this->authorize('update', $design);
         // $id because we want to be able to exclude the current design from the validation process
         $this->validate($request, [
-            'title' => ['required', 'unique:designs,title,'. $id],
+            'title' => ['required', 'unique:designs,title,' . $id],
             'description' => ['required', 'string', 'min:20', 'max:140'],
             'tags' => ['required'],
             'team' => ['required_if:assign_to_team,true']
         ]);
-        
+
 
         $design = $this->designs->update($id, [
             'team_id' => $request->team,
             'title' => $request->title,
             'description' => $request->description,
-            'slug' => Str::slug($request->title), 
-            'is_live' => ! $design->upload_successful ? false : $request->is_live
+            'slug' => Str::slug($request->title),
+            'is_live' => !$design->upload_successful ? false : $request->is_live
         ]);
 
         // apply the tags, see eloquent-taggable for more infos
         $this->designs->applyTags($id, $request->tags);
-        
+
         return new DesignResource($design);
     }
 
@@ -78,16 +78,15 @@ class DesignController extends Controller
         $design = $this->designs->find($id);
         $this->authorize('delete', $design);
         // delete the files associated with the record (3 files)
-        foreach(['thumbnail', 'large', 'original'] as $size){
+        foreach (['thumbnail', 'large', 'original'] as $size) {
             // check if the file exists in the database; call the exists() method which needs the filepath where we want to check if the file exits
             // if that file exits in that storage, go ahead and delete it
-            if(Storage::disk($design->disk)->exists("uploads/designs/{$size}/".$design->image)){
-                Storage::disk($design->disk)->delete("uploads/designs/{$size}/".$design->image);
+            if (Storage::disk($design->disk)->exists("uploads/designs/{$size}/" . $design->image)) {
+                Storage::disk($design->disk)->delete("uploads/designs/{$size}/" . $design->image);
             }
         }
         $this->designs->delete($id);
         return response()->json(['message' => 'Record deleted'], 200);
-
     }
 
     public function like($id)
@@ -98,6 +97,7 @@ class DesignController extends Controller
             'total' => $total
         ], 200);
     }
+
 
     public function checkIfUserHasLiked($designId)
     {
@@ -115,36 +115,34 @@ class DesignController extends Controller
     public function findBySlug($slug)
     {
         $design = $this->designs->withCriteria([
-                new IsLive(), 
-                new EagerLoad(['user', 'comments'])
-            ])->findWhereFirst('slug', $slug);
+            new IsLive(),
+            new EagerLoad(['user', 'comments'])
+        ])->findWhereFirst('slug', $slug);
         return new DesignResource($design);
     }
 
     public function getForTeam($teamId)
     {
         $designs = $this->designs
-                        ->withCriteria([new IsLive()])
-                        ->findWhere('team_id', $teamId);
+            ->withCriteria([new IsLive()])
+            ->findWhere('team_id', $teamId);
         return DesignResource::collection($designs);
     }
 
     public function getForUser($userId)
     {
         $designs = $this->designs
-                        //->withCriteria([new IsLive()])
-                        ->findWhere('user_id', $userId);
+            //->withCriteria([new IsLive()])
+            ->findWhere('user_id', $userId);
         return DesignResource::collection($designs);
     }
 
     public function userOwnsDesign($id)
     {
         $design = $this->designs->withCriteria(
-            [ new ForUser(auth()->id())]
+            [new ForUser(auth()->id())]
         )->findWhereFirst('id', $id);
 
         return new DesignResource($design);
     }
-
-    
 }
